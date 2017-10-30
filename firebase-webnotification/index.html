@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+  <title>Firebase Web-push Notification</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" type="text/css" href="../mdl/material.css">
+  <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+  <div class="mdl-layout mdl-layout--fixed-header mdl-js-layout mdl-color--grey-100">
+    <header class="demo-header mdl-layout__header mdl-layout__header--scroll mdl-color--grey-100 mdl-color-text--grey-800">
+      <div class="mdl-layout__header-row">
+        <span class="mdl-layout-title">Firebase Web-push Notification</span>
+        <div class="mdl-layout-spacer"></div>
+      </div>
+    </header>
+    <div class="demo-ribbon"></div>
+    <main class="demo-main mdl-layout__content">
+      <div class="demo-container mdl-grid">
+        <div class="mdl-cell mdl-cell--2-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
+        <div class="demo-content mdl-color--white mdl-shadow--4dp content mdl-color-text--grey-800 mdl-cell mdl-cell--8-col">
+          <div class="demo-crumbs mdl-color-text--grey-500">
+            Penulis Cerita: @karebetconnec
+          </div>
+          <h1 class="title-page">Bagaimana Cara Menggunakan FCM (Firebase Cloud Messaging) untuk Web-push Notification</h1>
+          <p class="demo-area-token-grey">
+            Token:<br>
+            <span id="tokenarea"></span>
+          </p>
+          <p>
+
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="subscribe" >Aktifkan</button>
+            
+          </p>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <script type="text/javascript" src="jquery-3.2.1.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/4.6.0/firebase.js"></script>
+  <script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAT7b_W7QN0bjvEo5DAj_EfUw9nbquSIRg",
+    authDomain: "webpushnotif-ea0ef.firebaseapp.com",
+    databaseURL: "https://webpushnotif-ea0ef.firebaseio.com",
+    projectId: "webpushnotif-ea0ef",
+    storageBucket: "",
+    messagingSenderId: "901495106722"
+  };
+  firebase.initializeApp(config);
+  const messaging = firebase.messaging();
+  messaging.requestPermission()
+  .then(function() {
+    console.log('Notification permission granted.');
+    $('#subscribe').text('Unactive');
+  })
+  .catch(function(err) {
+    console.log('Unable to get permission to notify.', err);
+    $('#subscribe').text('Active');
+  });
+
+  function run() {
+    messaging.requestPermission()
+    .then(function() {
+      console.log('Notification permission granted.');
+      $('#subscribe').text('Unactive');
+    })
+    .catch(function(err) {
+      console.log('Unable to get permission to notify.', err);
+      $('#subscribe').text('Active');
+    });
+  }
+
+    // Get Instance ID token. Initially this makes a network call, once retrieved
+  // subsequent calls to getToken will return from cache.
+  messaging.getToken()
+  .then(function(currentToken) {
+    if (currentToken) {
+      console.log(currentToken);
+      $('#tokenarea').html(currentToken);
+    } else {
+      // Show permission request.
+      console.log('No Instance ID token available. Request permission to generate one.');
+      // Show permission UI.
+      updateUIForPushPermissionRequired();
+      
+    }
+  })
+  .catch(function(err) {
+    console.log('An error occurred while retrieving token. ', err);
+  });
+  messaging.onTokenRefresh(function() {
+    messaging.getToken()
+    .then(function(refreshedToken) {
+      console.log('Token refreshed.');
+      $('#tokenarea').html(refreshedToken);
+    // Indicate that the new Instance ID token has not yet been sent to the
+    // app server.
+    console.log(refreshedToken);
+    // ...
+  })
+    .catch(function(err) {
+      console.log('Unable to retrieve refreshed token ', err);
+    });
+  })
+
+  messaging.onMessage(function(payload) {
+    console.log("Message received. ", payload);
+  // ...
+});
+
+
+
+</script>
+<script type="text/javascript">
+  run();
+  $(document).on('click', '#subscribe', function(event) {
+    event.preventDefault();
+    run();
+  });
+</script>
+<script type="text/javascript" src="../mdl/material.min.js"></script>
+</body>
+</html>
